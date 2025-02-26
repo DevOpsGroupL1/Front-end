@@ -1,0 +1,200 @@
+@import url('https://fonts.googleapis.com/css2?family=Onest:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import "tailwindcss";
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+*::-webkit-scrollbar {
+  width: 1px;
+  height: 1px;
+  display: none;
+}
+
+
+*::-webkit-scrollbar-thumb {
+  background: #0f0f0f;
+}
+
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Onest", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: none;
+  background-color: #ffffff;
+}
+p, li, h1,h2,h3,h4,h5,h6, input, textarea, select, button {
+  font-family: "Onest", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+
+:root {
+  --text: hsl(0, 0%, 12%);
+  --gray: hsla(0, 0%, 12%, 0.03);
+  --primary-color: hsl(209, 98%, 65%);
+  --button-hover: hsl(1, 82%, 43%);
+  --light-gray: hsl(0, 0%, 98%);
+  --border-gray: hsl(223, 12%, 88%);
+  --yellow: hsl(48, 100%, 50%);
+  --blue: hsl(209, 98%, 65%);
+  --alice-blue: hsl(173, 98%, 65%);
+  --purple: hsl(248, 98%, 65%);
+}
+
+.custom-phone-input {
+  height: 56px;
+  font-family: 'Arial', sans-serif;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px 12px;
+  width: 100%;
+}
+
+.custom-phone-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.custom-phone-input .PhoneInputCountry {
+  margin-right: 8px;
+}
+.transition-opacity {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.transition-opacity {
+  transition: opacity 0.3s ease-in-out;
+}
+
+
+/* } */
+
+
+/* Remove default styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  background: transparent;
+}
+
+/* Remove default thumb (circular tracking button) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 0;
+  height: 0;
+}
+
+input[type="range"]::-ms-thumb {
+  width: 0;
+  height: 0;
+}
+
+/* Style the track */
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 4px;
+  cursor: pointer;
+  background: #D1D5DB;
+  border-radius: 9999px;
+}
+
+input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 4px;
+  cursor: pointer;
+  background: #D1D5DB;
+  border-radius: 9999px;
+}
+
+input[type="range"]::-ms-track {
+  width: 100%;
+  height: 4px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+/* Optional: Add a very small thumb for better UX, nearly invisible */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  background: black;
+  cursor: pointer;
+  margin-top: -3px;
+  /* You may need to adjust this value */
+}
+
+input[type="range"]::-moz-range-thumb {
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  background: black;
+  cursor: pointer;
+}
+
+input[type="range"]::-ms-thumb {
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  background: black;
+  cursor: pointer;
+}
+
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.loader {
+  width: 40px;
+  height: 40px;
+  --c: no-repeat linear-gradient(var(--primary-color) 0 0);
+  background: var(--c), var(--c), var(--c), var(--c);
+  background-size: 21px 21px;
+  animation: l5 1.5s infinite cubic-bezier(0.3, 1, 0, 1);
+}
+
+@keyframes l5 {
+  0% {
+    background-position: 0 0, 100% 0, 100% 100%, 0 100%
+  }
+
+  33% {
+    background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+    width: 60px;
+    height: 60px
+  }
+
+  66% {
+    background-position: 100% 0, 100% 100%, 0 100%, 0 0;
+    width: 60px;
+    height: 60px
+  }
+
+  100% {
+    background-position: 100% 0, 100% 100%, 0 100%, 0 0
+  }
+}

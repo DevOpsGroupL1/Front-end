@@ -1,0 +1,61 @@
+{
+  "name": "gropul1",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@hookform/resolvers": "^4.1.2",
+    "@mui/icons-material": "^6.4.6",
+    "@mui/material": "^6.4.6",
+    "@mui/x-date-pickers": "^7.27.1",
+    "@reduxjs/toolkit": "^2.6.0",
+    "@tailwindcss/vite": "^4.0.9",
+    "@tanstack/react-query": "^5.66.9",
+    "autoprefixer": "^10.4.20",
+    "axios": "^1.8.1",
+    "dayjs": "^1.11.13",
+    "js-cookie": "^3.0.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2",
+    "react-hot-toast": "^2.5.2",
+    "react-phone-number-input": "^3.4.12",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^7.2.0",
+    "redux": "^5.0.1",
+    "redux-logger": "^3.0.6",
+    "redux-persist": "^6.0.0",
+    "redux-toolkit": "^1.1.2",
+    "tailwindcss": "^4.0.9",
+    "yup": "^1.6.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.21.0",
+    "eslint-config-prettier": "^10.0.2",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^15.15.0",
+    "prettier": "^3.5.2",
+    "vite": "^6.2.0"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
+  },
+  "packageManager": "yarn@4.2.2+sha512.c44e283c54e02de9d1da8687025b030078c1b9648d2895a65aab8e64225bfb7becba87e1809fc0b4b6778bbd47a1e2ab6ac647de4c5e383a53a7c17db6c3ff4b"
+}
