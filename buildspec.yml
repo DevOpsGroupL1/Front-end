@@ -3,20 +3,23 @@ version: 0.2
 phases:
   install:
     commands:
-      - npm install -g corepack
-      - corepack enable
-      - corepack prepare yarn@4.2.2 --activate
+      - npm install -g yarn
+      - yum install -y aws-cli
   pre_build:
     commands:
-      - echo Installing dependencies...
+      - echo "Installing dependencies..."
       - yarn install
+      - aws s3 ls s3://groupl1-frontend || echo "S3 access error!"
   build:
     commands:
+      - echo "Building Vite app..."
       - yarn build
+      - ls -la dist
   post_build:
     commands:
+      - echo "Deploying to S3..."
+      - ls -la dist || echo "dist directory not found!"
       - aws s3 sync dist/ s3://groupl1-frontend --delete
-
 artifacts:
   files:
     - '**/*'
