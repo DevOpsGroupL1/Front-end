@@ -3,7 +3,9 @@ version: 0.2
 phases:
   install:
     commands:
-      - npm install -g yarn
+      - npm install -g corepack
+      - corepack enable
+      - corepack prepare yarn@4.2.2 --activate
       - yum install -y aws-cli
   pre_build:
     commands:
