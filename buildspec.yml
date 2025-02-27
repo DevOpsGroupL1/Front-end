@@ -11,7 +11,6 @@ phases:
     commands:
       - echo "Installing dependencies..."
       - yarn install
-      - aws s3 ls s3://groupl1-frontend || echo "S3 access error!"
   build:
     commands:
       - echo "Building Vite app..."
@@ -21,8 +20,10 @@ phases:
     commands:
       - echo "Deploying to S3..."
       - ls -la dist || echo "dist directory not found!"
-      - aws s3 sync dist/ s3://groupl1-frontend --delete
+      - aws s3 sync dist/ s3://groupl1-frontend
 artifacts:
   files:
     - '**/*'
   base-directory: dist
+
+
