@@ -21,7 +21,7 @@ phases:
       - echo "Deploying to S3..."
       - aws s3 sync dist/ s3://groupl1-frontend --delete
       # Using put-bucket-website instead of the deprecated s3 website command
-      - aws s3api put-bucket-website --bucket groupl1-frontend --website-configuration '{"IndexDocument":{"Suffix":"index.html"},"ErrorDocument":{"Key":"index.html"}}'
+      - aws s3api put-bucket-website --bucket groupl1-frontend --website-configuration '{"IndexDocument":{"Suffix":"index.html"},"ErrorDocument":{"Key":"index.html"}}' --region eu-west-2
 
 artifacts:
   files:
