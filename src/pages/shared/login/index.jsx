@@ -34,8 +34,6 @@ const Login = () => {
           <Tab value={USER_TYPE.DOCTOR} label="Doctor" />
         </Tabs>
       </div>
-      <p>Testing for update</p>
-
       <div>
         {userType === USER_TYPE.PATIENT ? <PatientLogin /> : <DoctorLogin />}
       </div>
