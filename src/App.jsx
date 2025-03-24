@@ -25,7 +25,7 @@ function App() {
             },
 
             success: {
-              duration: 3000,
+              duration: 3000, 
               iconTheme: {
                 primary: "green",
                 secondary: "black",
