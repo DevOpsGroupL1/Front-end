@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Onest:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
+@tailwind utilities;
 
 
 * {
@@ -39,6 +40,7 @@ p, li, h1,h2,h3,h4,h5,h6, input, textarea, select, button {
   font-family: "Onest", serif;
   font-optical-sizing: auto;
   font-style: normal;
+  color: white;
 }
 
 
@@ -46,6 +48,8 @@ p, li, h1,h2,h3,h4,h5,h6, input, textarea, select, button {
   --text: hsl(0, 0%, 12%);
   --gray: hsla(0, 0%, 12%, 0.03);
   --primary-color: hsl(209, 98%, 65%);
+  --patient-sidebar: hsl(232, 54%, 36%);
+  --patient-primary: hsl(220, 100%, 19%);
   --button-hover: hsl(1, 82%, 43%);
   --light-gray: hsl(0, 0%, 98%);
   --border-gray: hsl(223, 12%, 88%);
@@ -53,6 +57,7 @@ p, li, h1,h2,h3,h4,h5,h6, input, textarea, select, button {
   --blue: hsl(209, 98%, 65%);
   --alice-blue: hsl(173, 98%, 65%);
   --purple: hsl(248, 98%, 65%);
+  --test: #5c85e3;
 }
 
 .custom-phone-input {
