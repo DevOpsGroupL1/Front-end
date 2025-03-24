@@ -37,6 +37,8 @@ export const Home = () => {
                         <p className="text-sm !text-green-500">80% decrease</p>
                     </div>
                 </div>
+
+                
             </section>
         </div>
     )
