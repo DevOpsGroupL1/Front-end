@@ -3,8 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import Logo from "../../../assets/logo.png";
 
 export const PatientNavbar = () => {
-  const route = useLocation()
-  const currentRoute = route.pathname
+  const route = useLocation();
+  const currentRoute = route.pathname;
   return (
     <nav className="!py-3 !px-3 bg-[#0F2D6B] w-full h-screen">
       <img
@@ -16,13 +16,9 @@ export const PatientNavbar = () => {
         {Object.keys(PATIENT_MENUS).map((key) => (
           <Link to={`${PATIENT_MENUS[key]}`} key={key}>
             <div
-              className={
-              `text-white w-full text-sm rounded-md hover:bg-[rgba(63,189,241,0.2)] !p-3 ${currentRoute === PATIENT_MENUS[key] ? "bg-[rgba(63,189,241,0.2)]" : "bg-transparent"} `
-              }
+              className={`text-white w-full text-sm rounded-md hover:bg-[rgba(63,189,241,0.2)] !p-3 ${currentRoute === PATIENT_MENUS[key] ? "bg-[rgba(63,189,241,0.2)]" : "bg-transparent"} `}
             >
-              <div className="w-full h-full flex items-center bg-gradient-to-r from-[#1A4FBA] to-[#71DDB1]">
-                {key}
-              </div>
+              <div className="w-full h-full flex items-center">{key}</div>
             </div>
           </Link>
         ))}
