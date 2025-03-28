@@ -5,7 +5,7 @@ export const USER_TYPE = {
 
 export const PATIENT_MENUS = {
   HOME: "/",
-  REPORTS: "/reports",
+  REPORTS: "/report",
 };
 
 export const DOCTOR_MENUS = {
