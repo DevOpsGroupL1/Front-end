@@ -14,7 +14,7 @@ pipeline {
 
         stage('Build and Install dependencies') {
             steps {
-                echo 'Installing dependencies'
+                echo 'Installing application dependencies'
             }
         }
 
