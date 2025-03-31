@@ -6,3 +6,4 @@ export * from "./textField";
 export * from "./timePicker";
 export * from "./table";
 export * from "./calendar";
+export * from "./popMenu"
