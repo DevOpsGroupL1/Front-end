@@ -14,10 +14,6 @@ pipeline {
         stage('Install and build dependencies') {
             steps {
                 echo 'Installing dependencies'
-                script {
-                    def nodejs = tool name: 'NodeJS 20', type: 'NodeJS installations'
-                    env.PATH = "${nodejs}/bin:${env.PATH}"
-                }
                 sh 'npm install -g yarn'
                 sh 'yarn install'
             }
