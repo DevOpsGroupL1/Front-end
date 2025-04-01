@@ -6,15 +6,20 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'staging', url: 'https://github.com/DevOpsGroupL1/Front-end'
-
                 echo 'Source code from github repository -  staging branch'
+                git branch: 'staging', url: 'https://github.com/DevOpsGroupL1/Front-end'
             }
         }
 
-        stage('Build and Install dependencies') {
+        stage('Install and build dependencies') {
             steps {
-                echo 'Installing application dependencies'
+                echo 'Installing dependencies'
+                script {
+                    def nodejs = tool name: 'NodeJS 20', type: 'NodeJSInstallation'
+                    env.PATH = "${nodejs}/bin:${env.PATH}"
+                }
+                sh 'npm install -g yarn'
+                sh 'yarn install'
             }
         }
 
