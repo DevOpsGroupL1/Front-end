@@ -6,15 +6,17 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'staging', url: 'https://github.com/DevOpsGroupL1/Front-end'
-
                 echo 'Source code from github repository -  staging branch'
+
+                git branch: 'staging', url: 'https://github.com/DevOpsGroupL1/Front-end'
             }
         }
 
-        stage('Build and Install dependencies') {
+        stage('Install and build dependencies') {
             steps {
-                echo 'Installing application dependencies'
+                echo 'Installing dependencies'
+                sh 'npm install yarn'
+                sh 'yarn install'
             }
         }
 
