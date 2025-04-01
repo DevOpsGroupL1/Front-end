@@ -9,6 +9,5 @@ export const PATIENT_MENUS = {
 };
 
 export const DOCTOR_MENUS = {
-  HOME: "/",
   PATIENTS: "/patients",
 };
