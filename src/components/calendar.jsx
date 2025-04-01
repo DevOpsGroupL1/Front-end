@@ -1,5 +1,17 @@
 import React, { useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
+import { 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions,
+  IconButton,
+  Typography,
+  Box,
+  Button,
+  Chip,
+  Paper
+} from "@mui/material";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
@@ -88,7 +100,7 @@ const generateMockEvents = () => {
         color: eventType.color,
         description:
           eventType.descriptions[
-            Math.floor(Math.random() * eventType.descriptions.length)
+          Math.floor(Math.random() * eventType.descriptions.length)
           ],
         calendarId: Math.floor(Math.random() * 3) + 1, // Assign to random calendar
         isCompleted: false,
@@ -101,69 +113,70 @@ const generateMockEvents = () => {
 
 // Event Details Modal with Mark as Done
 const EventDetailsModal = ({ event, isOpen, onClose, onMarkAsDone }) => {
-  if (!isOpen || !event) return null;
-
-  const handleBackgroundClick = (e) => {
-    // Close modal if click is directly on the background overlay
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
+  if (!event) return null;
 
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-      onClick={handleBackgroundClick}
+    <Dialog 
+      open={isOpen} 
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
     >
-      <div
-        className="bg-white p-6 rounded-lg w-96 relative"
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
-      >
-        <button
+      <DialogTitle className="text-sm !text-black" sx={{ m: 0, p: 2 }}>
+        {event.title}
+        <IconButton
+          aria-label="close"
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
         >
-          ✕
-        </button>
-
-        <h2 className="text-xl font-bold mb-4 text-gray-800">{event.title}</h2>
-
-        <div className="mb-4">
-          <p className="text-gray-700">
+          x
+        </IconButton>
+      </DialogTitle>
+      
+      <DialogContent dividers>
+        <Box sx={{ mb: 2 }}>
+          <p className="text-sm !text-black">
             <strong>Date:</strong> {moment(event.start).format("MMMM Do, YYYY")}
           </p>
-          <p className="text-gray-700">
-            <strong>Time:</strong> {moment(event.start).format("h:mm A")} -{" "}
-            {moment(event.end).format("h:mm A")}
+          <p className="text-sm !text-black">
+            <strong>Time:</strong> {moment(event.start).format("h:mm A")} - {moment(event.end).format("h:mm A")}
           </p>
-        </div>
-
-        <div className="bg-gray-100 p-4 rounded mb-4">
-          <h3 className="font-semibold mb-2 text-gray-800">Description</h3>
-          <p className="text-gray-700">{event.description}</p>
-        </div>
-
-        <div className="flex justify-between items-center">
-          <span
-            className={`px-3 py-1 rounded ${event.isCompleted ? "bg-green-500 text-white" : "bg-yellow-500 text-black"}`}
+        </Box>
+        
+        <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.100', mb: 2 }}>
+          <p className="text-sm !text-black">
+            Description
+          </p>
+          <p className="text-sm !text-black">
+            {event.description}
+          </p>
+        </Paper>
+      </DialogContent>
+      
+      <DialogActions sx={{ p: 2, justifyContent: 'space-between' }}>
+        <Chip 
+          label={event.isCompleted ? "Completed" : "Pending"} 
+          color={event.isCompleted ? "success" : "warning"}
+        />
+        
+        {!event.isCompleted && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => onMarkAsDone(event)}
           >
-            {event.isCompleted ? "Completed" : "Pending"}
-          </span>
-
-          {!event.isCompleted && (
-            <button
-              onClick={() => onMarkAsDone(event)}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-            >
-              Mark as Done
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
+            Mark as Done
+          </Button>
+        )}
+      </DialogActions>
+    </Dialog>
   );
 };
-
 // Custom Event Component to show color and completion status
 const CustomEvent = ({ event }) => {
   return (
@@ -248,7 +261,7 @@ export const GCalendar = () => {
   return (
     <div className="flex h-screen bg-[transparent]">
       <div className="flex-1 p-4">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center !mb-4">
           <button
             onClick={goToPreviousMonth}
             className="bg-[#0F2D6B] text-white font-bold !px-4 !py-2 rounded hover:bg-blue-600 cursor-pointer text-xs"

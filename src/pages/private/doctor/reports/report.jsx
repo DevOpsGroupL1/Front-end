@@ -122,7 +122,7 @@ export const DoctorReports = () => {
         </div>
 
         <div>
-          <button className="bg-blue-500 text-sm cursor-pointer !p-2 text-white px-4 py-2 rounded-md">
+          <button onClick={() => handleNavigate("/add-patient")} className="bg-blue-500 text-sm cursor-pointer !p-2 text-white px-4 py-2 rounded-md">
             Add New Patient
           </button>
         </div>

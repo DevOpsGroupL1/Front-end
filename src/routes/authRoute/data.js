@@ -3,6 +3,7 @@ import { Home } from "../../pages/private/patient/home/home";
 import { PatientReports } from "../../pages/private/patient/reports/report.jsx";
 import { DoctorReports } from "../../pages/private/doctor/reports/report.jsx";
 import { DoctorPatientReports } from "../../pages/private/doctor/details/details.jsx";
+import { AddPatient } from "../../pages/private/doctor/addPatient/addPatient.jsx";
 
 
 const Login = lazy(() => import("../../pages/shared/login"));
@@ -52,8 +53,8 @@ export const doctorRoutes = [
     exact: true,
   },
   {
-    path: "/add-patient`",
-    element: Home,
+    path: "/add-patient",
+    element: AddPatient,
     exact: true,
   },
 ];
