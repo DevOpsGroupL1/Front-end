@@ -16,7 +16,7 @@ pipeline {
                 echo 'Installing dependencies'
                 sh '''
                 if ! command -v yarn &> /dev/null; then
-                    npm install -g yarn
+                    sudo npm install -g yarn
                 fi
                 '''
                 sh 'yarn install'
