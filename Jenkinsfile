@@ -18,6 +18,13 @@ pipeline {
             }
         }
 
+        stage('Debug Workspace') {
+            steps {
+                echo 'Listing workspace contents...'
+                sh 'ls -R'
+            }
+        }
+
         stage('Test') {
             steps {
                 echo 'Performing test 123'
