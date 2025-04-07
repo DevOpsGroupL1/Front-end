@@ -14,11 +14,6 @@ pipeline {
         stage('Install dependencies') {
             steps {
                 echo 'Installing dependencies'
-                sh '''
-                if ! command -v yarn &> /dev/null; then
-                    sudo npm install -g yarn
-                fi
-                '''
                 sh 'yarn install'
             }
         }
@@ -35,7 +30,7 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to docker') {
             steps {
                 echo 'Deployment'
             }
@@ -49,7 +44,7 @@ pipeline {
             echo 'Build successful! Deleting previous build artifacts.'
             deleteDir()
             echo 'Archiving new build artifacts.'
-            archiveArtifacts artifacts: '**/build/**', fingerprint: true
+            archiveArtifacts artifacts: '**', excludes: 'temp/**, *.log', allowEmptyArchive: true
             cleanWs()
         }
 
