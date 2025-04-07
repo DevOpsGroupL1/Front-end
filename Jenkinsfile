@@ -41,10 +41,8 @@ pipeline {
     post {
 
         success {
-            echo 'Build successful! Deleting previous build artifacts.'
-            deleteDir()
-            echo 'Archiving new build artifacts.'
-            archiveArtifacts artifacts: '**/*', excludes: 'temp/**, *.log', allowEmptyArchive: true
+            echo 'Build successful! Archiving new build artifacts.'
+            archiveArtifacts artifacts: '**', allowEmptyArchive: true
             cleanWs()
         }
 
