@@ -7,7 +7,7 @@ export const AddPatient = () => {
     const {
         control,
     } = useForm({
-    
+
     })
 
     return (
@@ -23,6 +23,18 @@ export const AddPatient = () => {
                 />
 
                 <GTextField
+                    label={"Drug Name"}
+                    name="drugName"
+                    placeholder={"Drug Name"}
+                />
+
+                <GTextField
+                    label={"Prescription"}
+                    name="prescription"
+                    placeholder={"Prescription"}
+                />
+
+                <GTextField
                     label={"Medical Description"}
                     name="medicalDescription"
                     placeholder={"Medical Description"}
@@ -30,16 +42,52 @@ export const AddPatient = () => {
 
                 <div className='flex gap-4 items-center'>
                     <GDatePicker
-                        label={"Medication Date"}
-                        name="medicationDate"
-                        placeholder={"Medication Date"}
+                        label={"Start Date"}
+                        name="startDate"
+                        placeholder={"Start Date"}
                         control={control}
                     />
                     <GTimePicker
                         label={"Time"}
-                        name="medicationTime"
-                        placeholder={"Medication Time"}
+                        name="startTime"
+                        placeholder={"Start Time"}
                     />
+                </div>
+
+                <div className='flex gap-4 items-center'>
+                    <GDatePicker
+                        label={"End Date"}
+                        name="endDate"
+                        placeholder={"End Date"}
+                        control={control}
+                    />
+                    <GTimePicker
+                        label={"End Time"}
+                        name="endTime"
+                        placeholder={"End Time"}
+                    />
+                </div>
+
+                <div className='flex w-full flex-col gap-4 items-center'>
+                    <p>Dosage</p>
+                    <GTextField
+                        label={"Dosage"}
+                        name="dosage"
+                        placeholder={"Dosage"}
+                    />
+                    <GTextField
+                        label={"description"}
+                        name="description"
+                        placeholder={"description"}
+                    />
+                    <div className='!w-full'>
+                        <GTimePicker
+                            label={"Intake Time"}
+                            name="intakeTime"
+                            placeholder={"Intake Time"}
+                        />
+                    </div>
+
                 </div>
 
 
