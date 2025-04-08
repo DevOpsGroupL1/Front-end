@@ -1,7 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { BASE_URL } from "./constants";
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const client = axios.create({
   baseURL: BASE_URL,
@@ -19,7 +19,10 @@ export const request = async (options) => {
   };
 
   const onError = (error) => {
-    return Promise.reject(error.response?.data);
+    if (error.response) {
+      return Promise.reject(error.response.data);
+    }
+    return Promise.reject(error);
   };
 
   return client(options).then(onSuccess).catch(onError);

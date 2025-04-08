@@ -10,6 +10,7 @@ export const GTimePicker = ({ label, value, onChange }) => {
       slots={{
         textField: TextField,
       }}
+      className={"w-full"}
       slotProps={{
         textField: {
           sx: {
