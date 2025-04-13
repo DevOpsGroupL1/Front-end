@@ -30,15 +30,37 @@ pipeline {
             }
         }
 
-        stage('Deploy to docker') {
+        stage('Build docker image') {
             steps {
-                echo 'Deployment'
+                echo 'Building docker image'
+                sh 'docker build -t groupone:latest -f Docker/Dockerfile.prod .'
+            }
+        }
+
+        stage('Deploy docker image to docker hub registry') {
+            steps {
+                echo 'Deploying docker image to docker hub'
+                steps {
+                withCredentials([usernamePassword(credentialsId: "${DOCKER_REGISTRY_CREDS}", passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+
+                        sh 'echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin docker.io'
+
+                        sh 'docker tag groupone:latest devopsgroupl1/groupone:latest'
+                        sh 'docker push devopsgroupl1/groupone:latest'
+
+                    }
+                }
             }
         }
 
     }
 
     post {
+        
+        always {
+            echo 'logging out of docker hub'
+            sh 'docker logout'
+        }
 
         success {
             echo 'Build successful! Archiving new build artifacts.'
