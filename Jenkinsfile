@@ -44,8 +44,8 @@ pipeline {
 
                 sh 'echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin docker.io'
 
-                sh 'docker tag groupone:latest devopsgroupl1/groupone:latest'
-                sh 'docker push devopsgroupl1/groupone:latest'
+                sh 'docker tag groupone:latest hardarmyyy/groupone:latest'
+                sh 'docker push hardarmyyy/groupone:latest'
 
                	}
             }
