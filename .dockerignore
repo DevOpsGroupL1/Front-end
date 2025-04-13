@@ -8,5 +8,5 @@ Jenkinsfile
 Docker/
 Dockerfile.dev
 Dockerfile.prod
-dockerbuild.sh
-dockerstart.sh
+Dockerbuild.sh
+Dockerstart.sh
