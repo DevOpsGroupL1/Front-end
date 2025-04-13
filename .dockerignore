@@ -3,6 +3,10 @@ README.md
 Jenkinsfile
 .git
 .gitignore
+
+# Ignore Docker-related files
+Docker/
 Dockerfile.dev
-dockerbuilddev.sh
-dockerrundev.sh
+Dockerfile.prod
+Dockerbuild.sh
+Dockerstart.sh
