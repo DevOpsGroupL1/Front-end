@@ -33,21 +33,21 @@ pipeline {
         stage('Build docker image') {
             steps {
                 echo 'Building docker image'
-                sh 'docker build -t groupone:latest -f Docker/Dockerfile.prod .'
+                sh 'docker build -t groupone -f Docker/Dockerfile.prod .'
             }
         }
 
         stage('Deploy docker image to docker hub registry') {
             steps {
-								echo 'Deploying docker image to docker hub'
+                echo 'Deploying docker image to docker hub'
                 withCredentials([usernamePassword(credentialsId: "${DOCKER_REGISTRY_CREDS}", passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
 
-                sh 'echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin docker.io'
+                    sh 'echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin docker.io'
 
-                sh 'docker tag groupone:latest hardarmyyy/groupone:latest'
-                sh 'docker push hardarmyyy/groupone:latest'
+                    sh 'docker tag groupone hardarmyyy/groupone:latest'
+                    sh 'docker push hardarmyyy/groupone:latest'
 
-               	}
+                }
             }
         }
 
