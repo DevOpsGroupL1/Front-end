@@ -34,8 +34,8 @@ while [[ ! $image_tag =~ ^[a-zA-Z0-9]+$ ]]; do
     read -p "Enter the image tag: " image_tag
 done
 
-while [[ ! $docker_file =~ ^Dockerfile\..* ]]; do
-    echo -e "\nInvalid Dockerfile name. It must start with 'Dockerfile.'.\n"
+while [[ ! $docker_file =~ ^Docker/Dockerfile.* ]]; do
+    echo -e "\nInvalid Dockerfile name. It must start with 'Docker/Dockerfile.'.\n"
     read -p "Enter the name of the Dockerfile: " docker_file
 done
 
