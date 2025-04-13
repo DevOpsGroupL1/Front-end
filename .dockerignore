@@ -1,0 +1,8 @@
+buildspec.yml
+README.md
+Jenkinsfile
+.git
+.gitignore
+Dockerfile.dev
+dockerbuilddev.sh
+dockerrundev.sh
