@@ -1,7 +1,9 @@
 pipeline {
 
     agent any
-
+    parameters {
+	string(name: 'REPO', defaultValue: '', description: 'Repository that trigger pipeline')
+    }
     stages {
 
         stage('Checkout') {
@@ -14,6 +16,7 @@ pipeline {
         stage('Install dependencies') {
             steps {
                 echo 'Installing dependencies'
+		echo "${params.REPO}"
                 sh 'yarn install'
             }
         }
