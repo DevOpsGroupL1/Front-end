@@ -42,12 +42,7 @@ pipeline {
 
         stage('Build and Install dependencies') {
             when {
-                anyOf {
-                    branch 'PR-*'
-                    expression {
-                        return branchName == 'staging'
-                    }
-                }
+                branch 'PR-*'
             }
             steps {
                 script {
@@ -116,7 +111,7 @@ pipeline {
                             sh 'echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin docker.io'
 
                             sh "docker tag groupone hardarmyyy/groupone-${BUILD_NUMBER}:latest"
-                            sh 'docker push hardarmyyy/groupone:latest'
+                            sh "docker push hardarmyyy/groupone-${BUILD_NUMBER}:latest"
 
                         }
                     }
