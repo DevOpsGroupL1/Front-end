@@ -74,9 +74,7 @@ pipeline {
 
         stage('Quality Assurance gate') {
             when {               
-                expression {
-                    return branchName == 'staging'
-                }               
+                branch 'PR-*'               
             }
             steps {
                 script {
@@ -117,7 +115,7 @@ pipeline {
 
                             sh 'echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin docker.io'
 
-                            sh 'docker tag groupone hardarmyyy/groupone:latest'
+                            sh "docker tag groupone hardarmyyy/groupone-${BUILD_NUMBER}:latest"
                             sh 'docker push hardarmyyy/groupone:latest'
 
                         }
@@ -130,25 +128,33 @@ pipeline {
 
     post {
         
-        always {
+        success {
             when {
                 expression {
                     return branchName == 'staging'
                 }
-            }          
-            echo 'logging out of docker hub'
-            sh 'docker logout'            
-        }
+            }     
+            script {
+                echo "Build successful. Cleaning up docker images for ${repoName} repository."
+                sh "docker rmi -f hardarmyyy/groupone-${BUILD_NUMBER}:latest"
 
-        success {
-            echo 'Build successful! Archiving new build artifacts.'
-            archiveArtifacts artifacts: '**', allowEmptyArchive: true
-            cleanWs()
+                echo 'logging out of docker hub'
+                sh 'docker logout'
+                
+                echo 'Archiving new build artifacts after success.'
+                archiveArtifacts artifacts: '**', allowEmptyArchive: true
+            }           
         }
 
         failure {
             echo 'Build failed. Check the logs for details.'
-            cleanWs()
+        }
+
+        always {  
+            script {
+                echo "Cleaning up workspace for ${repoName} repository."
+                cleanWs()
+            }               
         }
 
     }
