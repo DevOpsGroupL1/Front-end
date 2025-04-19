@@ -129,11 +129,6 @@ pipeline {
     post {
         
         success {
-            when {
-                expression {
-                    return branchName == 'staging'
-                }
-            }     
             script {
                 echo "Build successful. Cleaning up docker images for ${repoName} repository."
                 sh "docker rmi -f hardarmyyy/groupone-${BUILD_NUMBER}:latest"
