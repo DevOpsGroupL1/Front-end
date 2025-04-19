@@ -135,23 +135,22 @@ pipeline {
 
                 echo 'logging out of docker hub'
                 sh 'docker logout'
-                
-                echo 'Archiving new build artifacts after success.'
-                archiveArtifacts artifacts: '**', allowEmptyArchive: true
+
+                echo 'Storing build artifacts in the Jenkins workspace.'
+                dir('Front-end') {
+                    archiveArtifacts artifacts: '**', allowEmptyArchive: true
+                }
             }           
         }
 
         failure {
             echo 'Build failed. Check the logs for details.'
+            cleanWs()
         }
 
-        always {  
-            script {
-                echo "Cleaning up workspace for ${repoName} repository."
-                cleanWs()
-            }               
+        aborted {
+            echo 'Build was aborted. Check the logs for details.'
+            cleanWs()
         }
-
     }
-
 }
