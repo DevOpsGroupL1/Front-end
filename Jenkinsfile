@@ -4,6 +4,10 @@ def branchName = ''
 pipeline {
 
     agent any
+
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
+    }
     
     options {
         timestamps()
@@ -40,6 +44,34 @@ pipeline {
             }
         }
 
+        stage('SonarQube analysis') {
+            when {
+                branch 'PR-*'
+            }
+            steps {
+                script {
+                    dir('Front-end') {
+                        echo "Running SonarQube analysis for ${repoName} repository."
+                        withSonarQubeEnv('sonar-server') {
+                            sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectName=${repoName} -Dsonar.projectKey=${repoName} -Dsonar.projectVersion=${BUILD_NUMBER}"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('SonarQube quality gate') {
+            when {
+                branch 'PR-*'
+            }
+            steps {
+                script {
+                    echo "Waiting for SonarQube quality gate to pass for ${repoName} repository."                  
+                    waitForQualityGate abortPipeline: true, credentialsId: 'Sonar-token'                   
+                }
+            }
+        }
+
         stage('Build and Install dependencies') {
             when {
                 branch 'PR-*'
@@ -62,19 +94,6 @@ pipeline {
                 script {
                     dir('Front-end') {
                         echo "Running tests for ${repoName} repository."
-                    }
-                }
-            }
-        }
-
-        stage('Quality Assurance gate') {
-            when {               
-                branch 'PR-*'               
-            }
-            steps {
-                script {
-                    dir('Front-end') {
-                        echo "Running quality assurance for ${repoName} repository."
                     }
                 }
             }
@@ -119,22 +138,59 @@ pipeline {
             }
         }
 
+        stage('Clean up docker images') {
+            when {
+                expression {
+                    return branchName == 'staging'
+                }
+            }
+            steps {
+                script {
+                    echo "Cleaning up docker images for ${repoName} repository."
+                    sh "docker rmi -f hardarmyyy/groupone-${BUILD_NUMBER}:latest"
+                    sh "docker rmi -f groupone"
+                }
+            }
+        }
+
+        stage('Logout from docker hub') {
+            when {
+                expression {
+                    return branchName == 'staging'
+                }
+            }
+            steps {
+                script {
+                    echo 'Logging out of docker hub.'
+                    sh 'docker logout'
+                }
+            }
+        }
+
+        stage('Store build artifacts') {
+            when {
+                expression {
+                    return branchName == 'staging'
+                }
+            }
+            steps {
+                script {
+                    echo 'Storing build artifacts in the Jenkins workspace.'
+                    dir('Front-end') {
+                        archiveArtifacts artifacts: '**', allowEmptyArchive: true
+                    }
+                }
+            }
+        }
+
     }
 
     post {
         
         success {
             script {
-                echo "Build successful. Cleaning up docker images for ${repoName} repository."
-                sh "docker rmi -f hardarmyyy/groupone-${BUILD_NUMBER}:latest"
-
-                echo 'logging out of docker hub'
-                sh 'docker logout'
-
-                echo 'Storing build artifacts in the Jenkins workspace.'
-                dir('Front-end') {
-                    archiveArtifacts artifacts: '**', allowEmptyArchive: true
-                }
+                echo 'Build completed successfully.'
+                cleanWs()
             }           
         }
 
