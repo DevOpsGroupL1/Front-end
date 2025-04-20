@@ -48,12 +48,14 @@ pipeline {
             when {
                 branch 'PR-*'
             }
-            input {
-                message "Run SonarQube analysis for ${repoName} repository?"
-                ok 'Yes'
-                cancel 'No, run analysis later'
-            }
             steps {
+                input(
+                    id: 'userInput', 
+                    message: "Run SonarQube analysis for ${repoName} repository?",
+                    ok: 'Yes',
+                    cancel: 'No, run analysis later'
+                )
+            
                 script {
                     dir('Front-end') {
                         echo "Running SonarQube analysis for ${repoName} repository."
@@ -126,12 +128,14 @@ pipeline {
                     return branchName == 'staging'
                 }
             }
-            input {
-                message "Deploy docker image to docker hub registry for ${repoName} repository?"
-                ok 'Yes'
-                cancel 'No, deploy image later'
-            }
             steps {
+                input(
+                    id: 'userInput', 
+                    message: "Deploy docker image to docker hub registry for ${repoName} repository?",
+                    ok: 'Yes',
+                    cancel: 'No, deploy image later'
+                )
+                
                 script {
                     dir('Front-end') {
                         echo "Deploying docker image to docker hub registry for ${repoName} repository."
