@@ -4,6 +4,10 @@ def branchName = ''
 pipeline {
 
     agent any
+
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
+    }
     
     options {
         timestamps()
@@ -40,6 +44,34 @@ pipeline {
             }
         }
 
+        stage('SonarQube analysis') {
+            when {
+                branch 'PR-*'
+            }
+            steps {
+                script {
+                    dir('Front-end') {
+                        echo "Running SonarQube analysis for ${repoName} repository."
+                        withSonarQubeEnv('sonar-server') {
+                            sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectName=${repoName} -Dsonar.projectKey=${repoName} -Dsonar.projectVersion=${BUILD_NUMBER}"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('SonarQube quality gate') {
+            when {
+                branch 'PR-*'
+            }
+            steps {
+                script {
+                    echo "Waiting for SonarQube quality gate to pass for ${repoName} repository."                  
+                    waitForQualityGate abortPipeline: true, credentialsId: 'Sonar-token'                   
+                }
+            }
+        }
+
         stage('Build and Install dependencies') {
             when {
                 branch 'PR-*'
@@ -62,19 +94,6 @@ pipeline {
                 script {
                     dir('Front-end') {
                         echo "Running tests for ${repoName} repository."
-                    }
-                }
-            }
-        }
-
-        stage('Quality Assurance gate') {
-            when {               
-                branch 'PR-*'               
-            }
-            steps {
-                script {
-                    dir('Front-end') {
-                        echo "Running quality assurance for ${repoName} repository."
                     }
                 }
             }
