@@ -1,5 +1,7 @@
 def repoName = ''
 def branchName = ''
+def runSonar = false
+def runDeploy = false
 
 pipeline {
 
@@ -48,28 +50,44 @@ pipeline {
             when {
                 branch 'PR-*'
             }
-            steps {
-                input(
-                    id: 'userInput', 
-                    message: "Run SonarQube analysis for ${repoName} repository?",
-                    ok: 'Yes',
-                    cancel: 'No, run analysis later'
-                )
-            
+
+            steps { 
                 script {
-                    dir('Front-end') {
-                        echo "Running SonarQube analysis for ${repoName} repository."
-                        withSonarQubeEnv('sonar-server') {
-                            sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectName=${repoName} -Dsonar.projectKey=${repoName} -Dsonar.projectVersion=${BUILD_NUMBER}"
-                        }
+                    try {
+                        input(
+                            id: 'userInput', 
+                            message: "Proceed with SonarQube analysis for ${repoName} repository?",
+                            ok: 'Yes',
+                        )
+                        runSonar = true
+                    } catch (err) {
+                        echo "SonarQube analysis was skipped for ${repoName} repository."
+                        runSonar = false
                     }
+
+                    if (!runSonar) {
+                        echo "Skipping SonarQube analysis for ${repoName} repository."
+                        return
+                    } else {
+                        dir('Front-end') {
+                            echo "Running SonarQube analysis for ${repoName} repository."
+                            withSonarQubeEnv('sonar-server') {
+                                sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectName=${repoName} -Dsonar.projectKey=${repoName} -Dsonar.projectVersion=${BUILD_NUMBER}"
+                            }
+                        }
+                    }                  
                 }
             }
         }
 
         stage('SonarQube quality gate') {
             when {
-                branch 'PR-*'
+                allOf {
+                    branch 'PR-*'
+                    expression {
+                        return runSonar == true
+                    }
+                }
             }
             steps {
                 script {
@@ -129,15 +147,24 @@ pipeline {
                 }
             }
             steps {
-                input(
-                    id: 'userInput', 
-                    message: "Deploy docker image to docker hub registry for ${repoName} repository?",
-                    ok: 'Yes',
-                    cancel: 'No, deploy image later'
-                )
-                
                 script {
-                    dir('Front-end') {
+                    try{
+                        input(
+                            id: 'userInput', 
+                            message: "Proceed with deploying docker image to docker hub registry for ${repoName} repository?",
+                            ok: 'Yes',
+                        )
+                        runDeploy = true
+                    } catch (err) {
+                        echo "Image deployment was skipped for ${repoName} repository."
+                        runDeploy = false
+                    }
+
+                    if (!runDeploy) {
+                        echo "Skipping image deployment for ${repoName} repository."
+                        return
+                    } else {
+                        dir('Front-end') {
                         echo "Deploying docker image to docker hub registry for ${repoName} repository."
                         withCredentials([usernamePassword(credentialsId: "${DOCKER_REGISTRY_CREDS}", passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
 
@@ -145,9 +172,9 @@ pipeline {
 
                             sh "docker tag groupone hardarmyyy/groupone-${BUILD_NUMBER}:latest"
                             sh "docker push hardarmyyy/groupone-${BUILD_NUMBER}:latest"
-
                         }
                     }
+                    }                  
                 }               
             }
         }
