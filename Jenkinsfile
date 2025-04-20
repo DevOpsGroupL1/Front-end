@@ -48,6 +48,11 @@ pipeline {
             when {
                 branch 'PR-*'
             }
+            input {
+                message "Run SonarQube analysis for ${repoName} repository?"
+                ok 'Yes'
+                timeout 1 * 60
+            }
             steps {
                 script {
                     dir('Front-end') {
@@ -120,6 +125,11 @@ pipeline {
                 expression {
                     return branchName == 'staging'
                 }
+            }
+            input {
+                message "Deploy docker image to docker hub registry for ${repoName} repository?"
+                ok 'Yes'
+                timeout 1 * 60
             }
             steps {
                 script {
