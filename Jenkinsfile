@@ -51,7 +51,7 @@ pipeline {
             input {
                 message "Run SonarQube analysis for ${repoName} repository?"
                 ok 'Yes'
-                timeout 1 * 60
+                cancel 'No, run analysis later'
             }
             steps {
                 script {
@@ -129,7 +129,7 @@ pipeline {
             input {
                 message "Deploy docker image to docker hub registry for ${repoName} repository?"
                 ok 'Yes'
-                timeout 1 * 60
+                cancel 'No, deploy image later'
             }
             steps {
                 script {
