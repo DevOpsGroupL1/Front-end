@@ -119,22 +119,59 @@ pipeline {
             }
         }
 
+        stage('Clean up docker images') {
+            when {
+                expression {
+                    return branchName == 'staging'
+                }
+            }
+            steps {
+                script {
+                    echo "Cleaning up docker images for ${repoName} repository."
+                    sh "docker rmi -f hardarmyyy/groupone-${BUILD_NUMBER}:latest"
+                    sh "docker rmi -f groupone"
+                }
+            }
+        }
+
+        stage('Logout from docker hub') {
+            when {
+                expression {
+                    return branchName == 'staging'
+                }
+            }
+            steps {
+                script {
+                    echo 'Logging out of docker hub.'
+                    sh 'docker logout'
+                }
+            }
+        }
+
+        stage('Store build artifacts') {
+            when {
+                expression {
+                    return branchName == 'staging'
+                }
+            }
+            steps {
+                script {
+                    echo 'Storing build artifacts in the Jenkins workspace.'
+                    dir('Front-end') {
+                        archiveArtifacts artifacts: '**', allowEmptyArchive: true
+                    }
+                }
+            }
+        }
+
     }
 
     post {
         
         success {
             script {
-                echo "Build successful. Cleaning up docker images for ${repoName} repository."
-                sh "docker rmi -f hardarmyyy/groupone-${BUILD_NUMBER}:latest"
-
-                echo 'logging out of docker hub'
-                sh 'docker logout'
-
-                echo 'Storing build artifacts in the Jenkins workspace.'
-                dir('Front-end') {
-                    archiveArtifacts artifacts: '**', allowEmptyArchive: true
-                }
+                echo 'Build completed successfully.'
+                cleanWs()
             }           
         }
 
