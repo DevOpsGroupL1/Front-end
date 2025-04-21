@@ -109,7 +109,7 @@ pipeline {
                 script {
                     dir('Front-end') {
                         echo "Building docker image for ${repoName} repository."
-                        sh 'docker build -t groupone -f Docker/Dockerfile.prod .'
+                        sh 'docker build -t groupone -f Docker/Dockerfile.staging .'
                     }
                 }
             }
