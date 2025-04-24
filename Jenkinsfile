@@ -44,6 +44,20 @@ pipeline {
             }
         }
 
+        stage('Build and Install dependencies') {
+            when {
+                branch 'PR-*'
+            }
+            steps {
+                script {
+                    dir('Front-end') {
+                        echo "Installing dependencies for ${repoName} on branch ${branchName}."
+                        sh 'yarn install'
+                    }
+                }              
+            }
+        }
+
         stage('SonarQube analysis') {
             when {
                 branch 'PR-*'
@@ -69,20 +83,6 @@ pipeline {
                     echo "Waiting for SonarQube quality gate to pass for ${repoName} repository."                  
                     waitForQualityGate abortPipeline: true, credentialsId: 'Sonar-token'                   
                 }
-            }
-        }
-
-        stage('Build and Install dependencies') {
-            when {
-                branch 'PR-*'
-            }
-            steps {
-                script {
-                    dir('Front-end') {
-                        echo "Installing dependencies for ${repoName} on branch ${branchName}."
-                        sh 'yarn install'
-                    }
-                }              
             }
         }
 
@@ -129,8 +129,8 @@ pipeline {
 
                             sh 'echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin docker.io'
 
-                            sh "docker tag groupone hardarmyyy/groupone-${BUILD_NUMBER}:latest"
-                            sh "docker push hardarmyyy/groupone-${BUILD_NUMBER}:latest"
+                            sh "docker tag groupone ${env.USERNAME}/groupone-${BUILD_NUMBER}:latest"
+                            sh "docker push ${env.USERNAME}/groupone-${BUILD_NUMBER}:latest"
 
                         }
                     }
@@ -147,7 +147,7 @@ pipeline {
             steps {
                 script {
                     echo "Cleaning up docker images for ${repoName} repository."
-                    sh "docker rmi -f hardarmyyy/groupone-${BUILD_NUMBER}:latest"
+                    sh "docker rmi -f ${env.USERNAME}/groupone-${BUILD_NUMBER}:latest"
                     sh "docker rmi -f groupone"
                 }
             }
@@ -163,6 +163,29 @@ pipeline {
                 script {
                     echo 'Logging out of docker hub.'
                     sh 'docker logout'
+                }
+            }
+        }
+
+        stage('Deploy to staging environment') {
+            when {
+                expression {
+                    return branchName == 'staging'
+                }
+            }
+            steps {
+                script {
+                    echo "Deploying to staging environment for ${repoName} repository."
+                    sshagent(['jenkins-staging-ssh-key']) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${env.STAGING_USERNAME}@${env.STAGING_REMOTE_HOST} '
+                        docker stop stagingfe || true &&
+                        docker rm stagingfe || true  &&
+                        docker image prune -af || true &&
+                        docker run -d -p ${env.STAGING_PORT_FE}:5173 --name=stagingfe ${env.USERNAME}/groupone-${BUILD_NUMBER}:latest
+                        '
+                    """
+                }
                 }
             }
         }
