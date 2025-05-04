@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { Calendar, momentLocalizer } from "react-big-calendar";
-import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
+import React, { useState, useEffect } from "react";
+import { Calendar, momentLocalizer, Views } from "react-big-calendar";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
   DialogActions,
   IconButton,
   Typography,
@@ -14,117 +14,103 @@ import {
 } from "@mui/material";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import { useSelector } from "react-redux";
+import { GButton } from "./button";
+import { useApiSend } from "../hooks/useApi";
+import { markAsTaken } from "../urls";
+import toast from "react-hot-toast";
 
-// Mock Data Generator
-const generateMockEvents = () => {
+// Function to generate events from medication data
+const generateMedicationEvents = (medicationData) => {
   const events = [];
-  const startDate = moment().subtract(2, "months").startOf("month");
-  const endDate = moment().add(2, "months").endOf("month");
 
-  const eventTypes = [
-    {
-      title: "Team Meeting",
-      color: "#0F2D6B",
-      descriptions: [
-        "Discuss quarterly goals and progress",
-        "Review team performance metrics",
-        "Brainstorm new project initiatives",
-      ],
-    },
-    {
-      title: "Client Call",
-      color: "#0F2D6B",
-      descriptions: [
-        "Quarterly business review",
-        "Discuss project deliverables",
-        "Address client concerns and feedback",
-      ],
-    },
-    {
-      title: "Project Deadline",
-      color: "#0F2D6B",
-      descriptions: [
-        "Submit final project report",
-        "Prepare presentation materials",
-        "Compile project outcomes",
-      ],
-    },
-    {
-      title: "Conference",
-      color: "#0F2D6B",
-      descriptions: [
-        "Attend keynote speeches",
-        "Network with industry professionals",
-        "Learn about latest industry trends",
-      ],
-    },
-    {
-      title: "Workshop",
-      color: "#0F2D6B",
-      descriptions: [
-        "Hands-on skill development session",
-        "Interactive learning experience",
-        "Practical training workshop",
-      ],
-    },
-    {
-      title: "Training",
-      color: "#0F2D6B",
-      descriptions: [
-        "Professional development course",
-        "Learn new technologies",
-        "Skill enhancement session",
-      ],
-    },
-  ];
+  medicationData.forEach((medication) => {
+    const startDate = moment(medication.startDate);
+    const endDate = moment(medication.endDate);
 
-  // Generate events across a few months
-  for (let m = moment(startDate); m.isBefore(endDate); m.add(1, "days")) {
-    // Randomly decide if this day gets an event
-    if (Math.random() > 0.7) {
-      const eventType =
-        eventTypes[Math.floor(Math.random() * eventTypes.length)];
+    const colors = [
+      "#8E24AA",
+      "#D81B60",
+      "#0F2D6B",
+      "#E53935",
+      "#F57C00",
+      "#FFB300",
+      "#546E7A",
+    ];
 
-      // Randomize event time
-      const startHour = Math.floor(Math.random() * 16) + 8; // 8 AM to 11 PM
-      const duration = Math.random() > 0.5 ? 1 : 2; // 1 or 2 hours
+    // Select a consistent color based on medication ID
+    const colorIndex = Math.abs(
+      medication.id.split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0)
+    ) % colors.length;
+    const medicationColor = colors[colorIndex];
 
-      events.push({
-        id: events.length + 1,
-        title: eventType.title,
-        start: moment(m).hour(startHour).minute(0).toDate(),
-        end: moment(m)
-          .hour(startHour + duration)
-          .minute(0)
-          .toDate(),
-        color: eventType.color,
-        description:
-          eventType.descriptions[
-          Math.floor(Math.random() * eventType.descriptions.length)
-          ],
-        calendarId: Math.floor(Math.random() * 3) + 1, // Assign to random calendar
-        isCompleted: false,
+    // Generate events for each day and dosage
+    for (let date = moment(startDate); date.isSameOrBefore(endDate); date.add(1, 'days')) {
+      medication.dosages.forEach((dosage) => {
+        const intakeTime = moment(dosage.intakeTime);
+        const eventStart = moment(date)
+          .hour(intakeTime.hour())
+          .minute(intakeTime.minute())
+          .second(0);
+        const eventEnd = moment(eventStart).add(30, 'minutes');
+
+        console.log(medication, "medication")
+
+        events.push({
+          id: `${medication.id}-${dosage.id}-${date.format('YYYY-MM-DD')}`,
+          scheduleId: medication.id,
+          title: `${medication.drugName} - ${dosage.dosage}`,
+          start: eventStart.toDate(),
+          end: eventEnd.toDate(),
+          color: medicationColor,
+          description: `${dosage.description}`,
+          prescription: medication.prescription,
+          medicationId: medication.id,
+          dosageId: dosage.id,
+          isCompleted: dosage.taken,
+          allDosageData: dosage,
+          allMedicationData: medication,
+          date: date.format('YYYY-MM-DD'),
+        });
       });
     }
-  }
+  });
 
   return events;
 };
 
 // Event Details Modal with Mark as Done
-const EventDetailsModal = ({ event, isOpen, onClose, onMarkAsDone }) => {
+const EventDetailsModal = ({
+  user,
+  event,
+  isOpen,
+  onClose,
+  onMarkAsDone
+}) => {
+
+  const {mutate, isPending} = useApiSend(
+    () => markAsTaken(event?.dosageId, event?.scheduleId),
+    () => {
+      toast.success("Marked as taken");
+      onMarkAsDone(event);
+    },
+    () => {
+      toast.error("Failed to mark as taken");
+    }
+  )
+
   if (!event) return null;
 
   return (
-    <Dialog 
-      open={isOpen} 
+    <Dialog
+      open={isOpen}
       onClose={onClose}
       maxWidth="sm"
       fullWidth
     >
       <DialogTitle className="text-sm !text-black" sx={{ m: 0, p: 2 }}>
         {event.title}
-        <IconButton
+        {/* <IconButton
           aria-label="close"
           onClick={onClose}
           sx={{
@@ -135,9 +121,9 @@ const EventDetailsModal = ({ event, isOpen, onClose, onMarkAsDone }) => {
           }}
         >
           x
-        </IconButton>
+        </IconButton> */}
       </DialogTitle>
-      
+
       <DialogContent dividers>
         <Box sx={{ mb: 2 }}>
           <p className="text-sm !text-black">
@@ -146,37 +132,42 @@ const EventDetailsModal = ({ event, isOpen, onClose, onMarkAsDone }) => {
           <p className="text-sm !text-black">
             <strong>Time:</strong> {moment(event.start).format("h:mm A")} - {moment(event.end).format("h:mm A")}
           </p>
+          <p className="text-sm !text-black">
+            <strong>Drug:</strong> {event.allMedicationData.drugName}
+          </p>
+          <p className="text-sm !text-black">
+            <strong>Prescription:</strong> {event.prescription}
+          </p>
         </Box>
-        
+
         <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.100', mb: 2 }}>
-          <p className="text-sm !text-black">
-            Description
-          </p>
-          <p className="text-sm !text-black">
-            {event.description}
-          </p>
+          <p className="text-sm !text-black font-bold">Description</p>
+          <p className="text-sm !text-black">{event.description}</p>
         </Paper>
       </DialogContent>
-      
+
       <DialogActions sx={{ p: 2, justifyContent: 'space-between' }}>
-        <Chip 
-          label={event.isCompleted ? "Completed" : "Pending"} 
+        <Chip
+          label={event.isCompleted ? "Taken" : "Not Taken"}
           color={event.isCompleted ? "success" : "warning"}
         />
-        
-        {!event.isCompleted && (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => onMarkAsDone(event)}
-          >
-            Mark as Done
-          </Button>
+
+        {(!event.isCompleted && user?.user?.userRole?.id === 1) && (
+
+          <GButton
+            className="!w-auto !px-4"
+            label="Mark as Taken"
+            onClick={() => mutate()}
+            isLoading={isPending}
+            disabled={isPending}
+          />
+
         )}
       </DialogActions>
     </Dialog>
   );
 };
+
 // Custom Event Component to show color and completion status
 const CustomEvent = ({ event }) => {
   return (
@@ -185,11 +176,12 @@ const CustomEvent = ({ event }) => {
       style={{
         backgroundColor: event.isCompleted
           ? "#48BB78" // Green for completed events
-          : "#0F2D6B",
+          : event.color,
         color: "white",
         borderRadius: "4px",
         overflow: "hidden",
         textOverflow: "ellipsis",
+        padding: "4px",
       }}
     >
       {event.title}
@@ -201,41 +193,52 @@ const CustomEvent = ({ event }) => {
 };
 
 // Custom Date Cell Wrapper
-const CustomDateCellWrapper = ({ children, value }) => {
-  // Check if this date has any events
-  const hasEvents = children.props.events && children.props.events.length > 0;
+const CustomDateCellWrapper = ({ children, value, darkMode }) => {
+  const date = moment(value).format('YYYY-MM-DD');
+  const events = children.props.events || [];
 
-  // Check if any events on this date are completed
-  const hasCompletedEvents =
-    hasEvents && children.props.events.some((event) => event.isCompleted);
+  // Filter events for this date
+  const dateEvents = events.filter(e => moment(e.start).format('YYYY-MM-DD') === date);
+
+  // Group by medication
+  const medsMap = dateEvents.reduce((map, e) => {
+    map[e.medicationId] = map[e.medicationId] || [];
+    map[e.medicationId].push(e);
+    return map;
+  }, {});
+
+  // All taken check
+  const allTaken = dateEvents.length > 0 && Object.values(medsMap).every(arr => arr.every(e => e.isCompleted));
 
   return React.cloneElement(children, {
     style: {
       ...children.props.style,
-      backgroundColor: hasCompletedEvents
-        ? "#9AE6B4" // Light green for dates with completed events
-        : hasEvents
-          ? "#eb3446"
-          : "transparent", // Light blue for dates with events
+      backgroundColor: allTaken
+        ? "#9AE6B4" // Light green if all dosages done
+        : darkMode ? "rgba(63,189,241,0.2)" : "transparent",
     },
   });
 };
 
 // Main Calendar Component
-export const GCalendar = () => {
+export const MedicationCalendar = ({ medicationData, darkMode }) => {
   const localizer = momentLocalizer(moment);
-
-  const [events, setEvents] = useState(generateMockEvents());
+  const [events, setEvents] = useState([]);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentView, setCurrentView] = useState('month');
+  const user = useSelector(state => state.auth);
 
-  const [calendars, setCalendars] = useState([
-    { id: 1, name: "Personal", color: "#0F2D6B", visible: true },
-    { id: 2, name: "Work", color: "#0F2D6B", visible: true },
-    { id: 3, name: "Holidays", color: "#0F2D6B", visible: true },
-  ]);
 
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  useEffect(() => {
+    if (medicationData && medicationData.length) {
+      setEvents(generateMedicationEvents(medicationData));
+    }
+  }, [medicationData]);
+
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+
+  console.log(selectedEvent, "selectedEvent")
 
   const handleSelectEvent = (event) => {
     setSelectedEvent(event);
@@ -243,70 +246,60 @@ export const GCalendar = () => {
   };
 
   const handleMarkAsDone = (event) => {
-    setEvents(
-      events.map((e) => (e.id === event.id ? { ...e, isCompleted: true } : e)),
-    );
+    setEvents(events.map(e => e.id === event.id ? { ...e, isCompleted: true } : e));
     setIsDetailsModalOpen(false);
   };
 
-  // Navigation handlers
-  const goToPreviousMonth = () => {
-    setCurrentDate(moment(currentDate).subtract(1, "month").toDate());
-  };
+  const goToPreviousMonth = () => setCurrentDate(moment(currentDate).subtract(1, "month").toDate());
+  const goToNextMonth = () => setCurrentDate(moment(currentDate).add(1, "month").toDate());
 
-  const goToNextMonth = () => {
-    setCurrentDate(moment(currentDate).add(1, "month").toDate());
+  // Text color class based on dark mode
+  const textColorClass = darkMode ? "text-white" : "text-black";
+
+  // Custom components with dark mode prop
+  const components = {
+    event: CustomEvent,
+    dateCellWrapper: (props) => <CustomDateCellWrapper {...props} darkMode={darkMode} />
   };
 
   return (
-    <div className="flex h-screen bg-[transparent]">
-      <div className="flex-1 p-4">
-        <div className="flex justify-between items-center !mb-4">
-          <button
-            onClick={goToPreviousMonth}
-            className="bg-[#0F2D6B] text-white font-bold !px-4 !py-2 rounded hover:bg-blue-600 cursor-pointer text-xs"
-          >
-            Previous Month
-          </button>
-          <h2 className="text-xl font-bold">
-            {moment(currentDate).format("MMMM YYYY")}
-          </h2>
-          <button
-            onClick={goToNextMonth}
-            className="bg-[#0F2D6B] text-white font-bold !px-4 !py-2 rounded hover:bg-blue-600 cursor-pointer text-xs"
-          >
-            Next Month
-          </button>
-        </div>
+    <div className={`flex flex-col w-full h-full bg-[transparent] overflow-hidden ${darkMode ? "rgba(63,189,241,0.2)" : ""}`}>
+      <div className="flex justify-between items-center !mb-4">
+        <button onClick={goToPreviousMonth} className="bg-[#0F2D6B] text-white font-bold !px-4 !py-2 rounded hover:bg-blue-600 cursor-pointer text-xs">
+          Previous
+        </button>
+        {/* <h2 className={`text-xl font-bold ${textColorClass}`}>{moment(currentDate).format("MMMM YYYY")}</h2> */}
+        <button onClick={goToNextMonth} className="bg-[#0F2D6B] text-white font-bold !px-4 !py-2 rounded hover:bg-blue-600 cursor-pointer text-xs">
+          Next
+        </button>
+      </div>
+      <div className="flex-1 overflow-x-auto overflow-y-auto">
         <Calendar
           localizer={localizer}
           date={currentDate}
-          onNavigate={(newDate) => setCurrentDate(newDate)}
-          events={events.filter(
-            (event) =>
-              calendars.find((cal) => cal.id === event.calendarId)?.visible ??
-              true,
-          )}
+          onNavigate={setCurrentDate}
+          events={events}
+          view={currentView}
+          onView={setCurrentView}
+          views={['month', 'week', 'day', 'agenda']}
           startAccessor="start"
           endAccessor="end"
           style={{
             height: "100%",
+            minWidth: "800px",
             border: "none",
             borderColor: "transparent",
+            color: darkMode ? "white" : "inherit"
           }}
           onSelectEvent={handleSelectEvent}
           selectable
-          components={{
-            event: CustomEvent,
-            dateCellWrapper: CustomDateCellWrapper,
-          }}
+          components={components}
         />
       </div>
-
-      {/* Event Details Modal */}
       <EventDetailsModal
         event={selectedEvent}
         isOpen={isDetailsModalOpen}
+        user={user}
         onClose={() => setIsDetailsModalOpen(false)}
         onMarkAsDone={handleMarkAsDone}
       />

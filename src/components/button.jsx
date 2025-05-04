@@ -76,7 +76,7 @@ export const GButton = ({
       {...props}
     >
       {isLoading ? (
-        <CircularProgress sx={{ color: "white" }} />
+        <CircularProgress sx={{ color: "white", width: 20, height: 20 }} />
       ) : typeof label === "function" ? (
         label()
       ) : (

@@ -1,6 +1,9 @@
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import { useSelector } from "react-redux";
+import { calculateAge } from "../../../utils";
 
 export const UserDetails = () => {
+  const user = useSelector((state) => state?.auth);
   return (
     <div
       className={
@@ -14,10 +17,10 @@ export const UserDetails = () => {
         className={"w-[60px] h-[60px] rounded-full !my-4 "}
       />
       <div className={"flex flex-col items-center justify-center"}>
-        <h4 className={"font-bold text-xl text-white mb-3"}>Victor Ama</h4>
+        <h4 className={"font-bold text-xl text-white mb-3"}>{user?.user?.fName} {user?.user?.lName}</h4>
         <div className={"flex items-center gap-2"}>
           <p className={"text-white text-xs border-r-2 !pr-2 border-r-white"}>
-            25 years old
+            {calculateAge(user?.user?.userDetail?.dob)} years old
           </p>
           <p className={"flex gap-1 items-center text-xs text-white"}>
             {" "}
@@ -27,15 +30,15 @@ export const UserDetails = () => {
         <div className={"w-full flex justify-between !mt-4 gap-2"}>
           <div className={"border-r-2 border-r-white !pr-4"}>
             <p className={"text-gray-400 text-xs"}>Blood</p>
-            <p className={"text-white text-center font-bold"}>O+</p>
+            <p className={"text-white text-center font-bold"}>{user?.user?.userDetail?.bloodType}</p>
           </div>
           <div className={"border-r-2 border-r-white !pr-4"}>
             <p className={"text-gray-400 text-xs"}>Height</p>
-            <p className={"text-white text-center font-bold"}>186cm</p>
+            <p className={"text-white text-center font-bold"}>{user?.user?.userDetail?.height}m</p>
           </div>
           <div className={""}>
             <p className={"text-gray-400 text-xs"}>Weight</p>
-            <p className={"text-white text-center font-bold"}>90kg</p>
+            <p className={"text-white text-center font-bold"}>{user?.user?.userDetail?.weight}kg</p>
           </div>
         </div>
       </div>

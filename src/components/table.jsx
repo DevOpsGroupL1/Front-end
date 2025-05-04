@@ -9,34 +9,26 @@ import Paper from '@mui/material/Paper';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "#2c4770", // Deep navy blue for header
+    backgroundColor: "#2c4770",
     color: theme.palette.common.white,
-    fontWeight: "bold", // Make header text bold
+    fontWeight: "bold",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
-    backgroundColor: "#0F2D6B", // Lighter navy blue for body rows
-    color: theme.palette.common.white, // White text for body
+    backgroundColor: "#0F2D6B",
+    color: theme.palette.common.white,
   },
-  // Ensure white text color for links or any other elements inside cells
   "& a": {
     color: theme.palette.common.white,
   },
 }));
 
 const StyledTableRow = styled(TableRow)(() => ({
-  // Removing the odd/even row styling as we now have a consistent background
   "&:last-child td, &:last-child th": {
     border: 0,
   },
 }));
 
-// Default data for the table
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
-
-// Default data for the table - now using direct object format
 const defaultRows = [
   { name: 'Frozen yoghurt', calories: 159, fat: 6.0, carbs: 24, protein: 4.0 },
   { name: 'Ice cream sandwich', calories: 237, fat: 9.0, carbs: 37, protein: 4.3 },
@@ -45,7 +37,6 @@ const defaultRows = [
   { name: 'Gingerbread', calories: 356, fat: 16.0, carbs: 49, protein: 3.9 },
 ];
 
-// Default columns configuration
 const defaultColumns = [
   { id: 'name', label: 'Sickness', align: 'left' },
   { id: 'calories', label: 'Doctor', align: 'right' },
@@ -57,11 +48,19 @@ const defaultColumns = [
 export const GTable = ({
   columns = defaultColumns,
   data = defaultRows,
-  minWidth = 700
+  minWidth = 700,
+  pressable = false,
+  onRowClick = (row) => {}
 }) => {
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth }} aria-label="customized table">
+    <TableContainer
+      component={Paper}
+      sx={{ overflowX: 'auto' }}
+    >
+      <Table sx={{
+        minWidth,
+        overflowX: 'auto'
+      }} aria-label="customized table">
         <TableHead>
           <TableRow>
             {columns.map((column) => (
@@ -73,7 +72,17 @@ export const GTable = ({
         </TableHead>
         <TableBody>
           {data.map((row, rowIndex) => (
-            <StyledTableRow key={rowIndex}>
+            <StyledTableRow 
+              key={rowIndex}
+              onClick={pressable ? () => onRowClick(row) : undefined}
+              sx={pressable ? { 
+                cursor: 'pointer', 
+                '&:hover': { 
+                  opacity: 0.8,
+                  transition: 'opacity 0.2s'
+                } 
+              } : {}}
+            >
               {columns.map((column) => (
                 <StyledTableCell
                   key={`${rowIndex}-${column.id}`}
