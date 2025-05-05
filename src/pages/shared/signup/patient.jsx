@@ -4,7 +4,13 @@ import PhoneInput from "react-phone-number-input";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SignupSchema } from "./schema.js";
 import { useApiSend } from "../../../hooks/useApi.js";
-import { registerPatient } from "../../../urls";
+import { activateUser, registerPatient } from "../../../urls";
+import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
+import { setCurrentUser } from "../../../redux/reducers/authSlice.js";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 export const PatientSignup = () => {
   const {
@@ -16,18 +22,42 @@ export const PatientSignup = () => {
     resolver: yupResolver(SignupSchema),
   });
 
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate()
 
-  const { mutate, isPending } = useApiSend(
-    registerPatient,
-    () => {
+  const dispatch = useDispatch();
 
+  const { mutate: activate, isPending: isActivating } = useApiSend(
+    activateUser,
+    (data) => {
+      if (data?.responseCode === "99") {
+        toast.error(data?.responseMessage);
+        return;
+      }
+      else {
+        toast.success("Registration successful");
+        toast.toString("Please login to continue");
+        navigate("/")
+      }
     },
-    (error) => {
-      console.log(error);
+    () => {
+      toast.error("Registration failed");
     }
   )
 
-  console.log(errors);
+
+  const { mutate, isPending } = useApiSend(
+    registerPatient,
+    (data) => {
+      setUser(data)
+      activate(data?.id)
+
+    },
+    () => {
+      toast.error("Registration failed");
+    }
+  )
+
 
   const onSubmit = (data) => {
     console.log(data);
@@ -148,7 +178,7 @@ export const PatientSignup = () => {
         </p>
       )}
 
-      <GButton type={"submit"} label={"Login"} />
+      <GButton isLoading={isPending || isActivating} type={"submit"} label={"Sign Up"} />
     </form>
   );
 };
