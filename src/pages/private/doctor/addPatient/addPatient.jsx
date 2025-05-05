@@ -11,8 +11,7 @@ export const AddPatient = () => {
     const { state } = useLocation()
     const navigate = useNavigate()
     const user = useSelector((state) => state.auth)
-    console.log("user", user);
-    console.log("state", state);
+    
 
 
     const [dosages, setDosages] = useState([{ id: Date.now() }]);
@@ -94,7 +93,7 @@ export const AddPatient = () => {
         };
 
         mutate(payload)
-        console.log("payload", payload);
+        
     }
 
     return (

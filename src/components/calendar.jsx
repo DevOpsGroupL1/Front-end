@@ -54,7 +54,7 @@ const generateMedicationEvents = (medicationData) => {
           .second(0);
         const eventEnd = moment(eventStart).add(30, 'minutes');
 
-        console.log(medication, "medication")
+        
 
         events.push({
           id: `${medication.id}-${dosage.id}-${date.format('YYYY-MM-DD')}`,
@@ -238,7 +238,7 @@ export const MedicationCalendar = ({ medicationData, darkMode }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
-  console.log(selectedEvent, "selectedEvent")
+  
 
   const handleSelectEvent = (event) => {
     setSelectedEvent(event);

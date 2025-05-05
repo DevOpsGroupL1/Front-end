@@ -26,7 +26,7 @@ export const DoctorReports = () => {
     { name: "Drafts", value: "drafts" },
   ];
   const handleNavigate = (route, data) => {
-    console.log(data, "transfer data")
+    
     navigate(route, {
       state: { ...data }
     });
@@ -59,7 +59,7 @@ export const DoctorReports = () => {
       bmi: Math.round(patient?.bmi * 100) / 100,
       email: patient?.email,
       action: function () {
-        console.log(patient, "patient")
+        
         return (
           <PopMenu
             options={[

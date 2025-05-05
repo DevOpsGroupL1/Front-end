@@ -10,7 +10,7 @@ import DOCTOR from "../../../assets/doctor.png"
 const Login = () => {
   const [userType, setUserType] = useState(USER_TYPE.PATIENT);
   const handleTypeChange = (e, newValue) => {
-    console.log(newValue);
+    
     setUserType(newValue);
   };
 

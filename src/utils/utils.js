@@ -4,12 +4,12 @@ export const formatDate = (isoDateString) => {
 }
 
 export const filterPatients = (data) => {
-  console.log("data", data);
+  
   const results = data?.filter((item) =>
     item?.userRole?.id === 1
   )
 
-  console.log("results", results);
+  
   const tableData = results?.map((item) => {
     return {
       id: item?.id,

@@ -4,7 +4,7 @@ import { PatientRouter } from './patientRouter';
 
 export const MainRouter = () => {
     const user = useSelector((state) => state?.auth);
-    console.log(user, "user");
+    
     if (user?.user?.userRole?.id === 1) {
         return <PatientRouter />
     }

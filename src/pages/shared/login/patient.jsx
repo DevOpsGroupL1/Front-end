@@ -27,13 +27,13 @@ export const PatientLogin = () => {
   const { mutate, isPending } = useApiSend(
     loginUser,
     (data) => {
-      // console.log(data, "data")
+      // 
       // if (data?.responseCode === "98") {
       //   toast.error(data?.responseMessage);
       // }
       // else {
       //   toast.success("Login successful");
-      //   console.log(data, "data, success side")
+      //   
       //   // dispatch(setCurrentUser(data));
       //   // Cookies.set("token", data?.token);
       //   // navigate("/");

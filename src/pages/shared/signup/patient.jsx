@@ -60,7 +60,7 @@ export const PatientSignup = () => {
 
 
   const onSubmit = (data) => {
-    console.log(data);
+    
     const det = {
       fName: data.fName,
       mName: data.mName,
