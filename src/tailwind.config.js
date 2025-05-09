@@ -10,6 +10,8 @@ export default {
       },
       colors: {
         "primary-color": "var(--primary-color)",
+        "patient-sidebar": "var(--patient-sidebar)",
+        "patient-primary": "var(--patient-primary)",
         text: "var(--text)",
         "light-gray": "var(--light-gray)",
         "border-gray": "var(--border-gray)",

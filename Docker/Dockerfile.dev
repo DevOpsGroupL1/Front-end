@@ -1,0 +1,20 @@
+FROM node:20.11.1-alpine3.19 AS base
+
+WORKDIR /app
+
+# Install corepack for Yarn 4 support
+RUN npm install -g corepack
+RUN corepack enable
+RUN corepack prepare yarn@4.2.2 --activate
+
+# Stage 1: Dependencies
+FROM base AS dependencies
+COPY ../package*.json ../yarn.lock ./
+RUN yarn install --immutable
+
+# Stage 2: Build
+FROM base AS build
+COPY . .
+EXPOSE 5173
+
+CMD ["sh", "-c", "yarn install && yarn dev --host 0.0.0.0"]

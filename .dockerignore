@@ -1,0 +1,12 @@
+buildspec.yml
+README.md
+Jenkinsfile
+.git
+.gitignore
+
+# Ignore Docker-related files
+Docker/
+Dockerfile.dev
+Dockerfile.prod
+Dockerbuild.sh
+Dockerstart.sh

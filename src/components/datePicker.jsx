@@ -17,16 +17,16 @@ export const GDatePicker = ({ label, name, control, error, errorText }) => {
               slotProps={{
                 textField: {
                   error: !!fieldState.error,
-                  fullWidth: true, // Make the TextField full width
+                  fullWidth: true,
                 },
               }}
               sx={{
-                width: "100%", // Set DatePicker width to 100%
+                width: "100%", 
                 "& label": {
                   color: "gray",
                 },
                 "& .MuiOutlinedInput-root": {
-                  width: "100%", // Ensure the input is full width
+                  width: "100%",
                   "& fieldset": {
                     borderColor: fieldState.error
                       ? "var(--error-color)"

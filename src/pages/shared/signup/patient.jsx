@@ -3,6 +3,14 @@ import { Controller, useForm } from "react-hook-form";
 import PhoneInput from "react-phone-number-input";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SignupSchema } from "./schema.js";
+import { useApiSend } from "../../../hooks/useApi.js";
+import { activateUser, registerPatient } from "../../../urls";
+import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
+import { setCurrentUser } from "../../../redux/reducers/authSlice.js";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 export const PatientSignup = () => {
   const {
@@ -13,15 +21,87 @@ export const PatientSignup = () => {
   } = useForm({
     resolver: yupResolver(SignupSchema),
   });
+
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate()
+
+  const dispatch = useDispatch();
+
+  const { mutate: activate, isPending: isActivating } = useApiSend(
+    activateUser,
+    (data) => {
+      if (data?.responseCode === "99") {
+        toast.error(data?.responseMessage);
+        return;
+      }
+      else {
+        toast.success("Registration successful");
+        toast.toString("Please login to continue");
+        navigate("/")
+      }
+    },
+    () => {
+      toast.error("Registration failed");
+    }
+  )
+
+
+  const { mutate, isPending } = useApiSend(
+    registerPatient,
+    (data) => {
+      setUser(data)
+      activate(data?.id)
+
+    },
+    () => {
+      toast.error("Registration failed");
+    }
+  )
+
+
+  const onSubmit = (data) => {
+    
+    const det = {
+      fName: data.fName,
+      mName: data.mName,
+      lName: data.lName,
+      email: data.email,
+      password: data.password,
+      userDetail: {
+        dob: data.dateOfBirth,
+        height: data.height,
+        weight: data.weight,
+        bloodType: data.bloodType,
+      }
+    }
+    mutate(det)
+  }
+
   return (
-    <form onSubmit={handleSubmit} className={"w-full flex flex-col gap-4"}>
+    <form onSubmit={handleSubmit(onSubmit)} className={"w-full flex flex-col gap-4"}>
       <GTextField
-        label="Full Name"
-        name="fullName"
-        placeholder={"Enter your full name"}
+        label="First Name"
+        name="fName"
+        placeholder={"Enter your first name"}
         register={register}
-        error={errors.email}
-        errorText={errors.email?.message}
+        error={errors.fName}
+        errorText={errors.fName?.message}
+      />
+      <GTextField
+        label="Middle Name"
+        name="mName"
+        placeholder={"Enter your middle name"}
+        register={register}
+        error={errors.mName}
+        errorText={errors.mName?.message}
+      />
+      <GTextField
+        label="Last Name"
+        name="lName"
+        placeholder={"Enter your last name"}
+        register={register}
+        error={errors.lName}
+        errorText={errors.lName?.message}
       />
 
       <GTextField
@@ -31,6 +111,16 @@ export const PatientSignup = () => {
         register={register}
         error={errors.email}
         errorText={errors.email?.message}
+      />
+
+      <GTextField
+        label="Password"
+        name="password"
+        inputType="password"
+        placeholder={"Enter Password"}
+        register={register}
+        error={errors.password}
+        errorText={errors.password?.message}
       />
 
       <GTextField
@@ -60,6 +150,7 @@ export const PatientSignup = () => {
         errorText={errors.height?.message}
       />
 
+
       <GDatePicker
         label="Date Of Birth"
         name="dateOfBirth"
@@ -68,7 +159,7 @@ export const PatientSignup = () => {
         errorText={errors.dateOfBirth?.message}
       />
 
-      <Controller
+      {/* <Controller
         name="phoneNumber"
         control={control}
         render={({ field }) => (
@@ -80,14 +171,14 @@ export const PatientSignup = () => {
             className="custom-phone-input"
           />
         )}
-      />
+      /> */}
       {errors.phoneNumber && (
         <p className="text-primary-color text-sm">
           {errors.phoneNumber.message}
         </p>
       )}
 
-      <GButton type={"submit"} label={"Login"} />
+      <GButton isLoading={isPending || isActivating} type={"submit"} label={"Sign Up"} />
     </form>
   );
 };

@@ -6,6 +6,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { persistor, store } from "./redux";
 import "./index.css";
 import "react-phone-number-input/style.css";
+import 'react-loading-skeleton/dist/skeleton.css'
 import App from "./App.jsx";
 
 createRoot(document.getElementById("root")).render(
