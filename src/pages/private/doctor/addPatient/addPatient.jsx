@@ -11,9 +11,6 @@ export const AddPatient = () => {
     const { state } = useLocation()
     const navigate = useNavigate()
     const user = useSelector((state) => state.auth)
-    console.log("user", user);
-    console.log("state", state);
-
 
     const [dosages, setDosages] = useState([{ id: Date.now() }]);
 
@@ -213,7 +210,7 @@ export const AddPatient = () => {
 
                 <GButton
                     type='submit'
-                    label={"Add Patient"}
+                    label={"Add Prescription"}
                     onClick={handleSubmit(onSubmit)}
                     isLoading={isPending}
                 />

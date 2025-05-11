@@ -33,7 +33,6 @@ export const request = async (options) => {
   }
 
   const onSuccess = (response) => {
-    console.log("response", response);
     return response?.data?.data;
   };
 

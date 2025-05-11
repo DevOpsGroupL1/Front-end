@@ -13,6 +13,8 @@ export const RecentlyTaken = () => {
     }
   )
 
+  console.log(data, "recently")
+
   const EmptyRecently = () => {
     return (
       <div className={"flex flex-col items-center justify-center h-[60%]"}>
@@ -25,17 +27,18 @@ export const RecentlyTaken = () => {
     <div>
       <h6 className={"font-bold text-xl !mb-5"}>Recently take dosages</h6>
       {
-        isLoading ? <div className="flex flex-col gap-1">
-          <Skeleton
-            baseColor="#3FBDF133"
-            height={80}
-          />
-        </div> : (
-          data?.length > 0 ? (
-            <div className={"flex flex-col gap-3"}>
-              <RecentlyCard />
-            </div>
-          ) : <EmptyRecently />)
+        isLoading ? (
+          <div className="flex flex-col gap-1">
+            <Skeleton
+              baseColor="#3FBDF133"
+              height={80}
+            />
+          </div>
+        ) : (
+          data ? (
+            <RecentlyCard key={data.id} item={data} />
+          ) : <EmptyRecently />
+        )
 
       }
 

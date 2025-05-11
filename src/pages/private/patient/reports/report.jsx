@@ -5,7 +5,7 @@ import { MedicationCalendar } from "../../../../components";
 export const PatientReports = () => {
 
   const { data, isLoading } = useApiGet(
-    ['get-schedule'],
+    ['get-my-reports'],
     () => getMyReports(),
     {
       enabled: true

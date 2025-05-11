@@ -1,6 +1,6 @@
 import NotificationsIcon from "@mui/icons-material/Notifications";
 
-export const UpcomingCard = () => {
+export const UpcomingCard = ({item}) => {
   return (
     <div
       className={
@@ -16,9 +16,9 @@ export const UpcomingCard = () => {
       </div>
 
       <div className={"flex flex-col gap-1"}>
-        <h6 className={"font-bold text-lg"}>Malaria dosage</h6>
-        <p className={"text-sm"}>Dr. Uchenna</p>
-        <p className={"text-sm"}>9:30am - 10:00am</p>
+        <h6 className={"font-bold text-lg"}>{item?.ailment} Medication</h6>
+        <p className={"text-sm"}>Dr. {item?.doctor?.fName} {item?.doctor?.lName}</p>
+        <p className={"text-sm"}>Dr. {item?.doctor?.doctorDetails?.specialization}</p>
       </div>
     </div>
   );
