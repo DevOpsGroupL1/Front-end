@@ -22,7 +22,7 @@ export const getMyReports = () => request({
 })
 
 
-export const markAsTaken = (dosageId, sechduleId) => request({
-    url: `/dosage/${dosageId}/schedule/${sechduleId}`,
+export const markAsTaken = (dosageId, sechduleId, dateTaken) => request({
+    url: `/dosage/${dosageId}/schedule/${sechduleId}/dateTaken/${dateTaken}`,
     method: "PUT",
 })

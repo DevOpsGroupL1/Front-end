@@ -39,8 +39,11 @@ export const Upcoming = () => {
           </div> : (
             data?.length > 0 ? (
               <div className={"flex flex-col gap-3"}>
-                <UpcomingCard />
-                <UpcomingCard />
+                {
+                  data?.map((item, index) => {
+                    return <UpcomingCard item={item} key={index} />
+                  })
+                }
               </div>
             ) : <EmptyUpcoming />)
 

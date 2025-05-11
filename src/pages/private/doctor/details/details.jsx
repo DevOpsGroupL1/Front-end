@@ -9,6 +9,7 @@ export const DoctorPatientReports = () => {
   const { id } = useParams()
   const { state } = location
 
+
   const { data, isLoading } = useApiGet(
     [`get-schedule-${state?.id ?? id}`],
     () => getPatientSchedule(state?.id ?? id),
@@ -17,12 +18,13 @@ export const DoctorPatientReports = () => {
     }
   )
 
+  
   return (
     <section className={"w-full h-full !p-10 !pb-20"}>
       <h2 className={"text-2xl font-bold !mb-10"}>
         Medical Prescription History
       </h2>
-      <div className="!h-[90%]">
+      <div className="!w-[65vw] !h-[87vh]">
         <MedicationCalendar medicationData={data} />
       </div>
 

@@ -54,10 +54,14 @@ const generateMedicationEvents = (medicationData) => {
           .second(0);
         const eventEnd = moment(eventStart).add(30, 'minutes');
 
-        console.log(medication, "medication")
+        // Check if this dosage was taken on this specific date
+        const formattedDate = date.format('YYYY-MM-DD');
+        const isTakenOnThisDate = dosage.datesTaken.some(dateTaken => 
+          moment(dateTaken.dateCreated).format('YYYY-MM-DD') === formattedDate
+        );
 
         events.push({
-          id: `${medication.id}-${dosage.id}-${date.format('YYYY-MM-DD')}`,
+          id: `${medication.id}-${dosage.id}-${formattedDate}`,
           scheduleId: medication.id,
           title: `${medication.drugName} - ${dosage.dosage}`,
           start: eventStart.toDate(),
@@ -67,10 +71,12 @@ const generateMedicationEvents = (medicationData) => {
           prescription: medication.prescription,
           medicationId: medication.id,
           dosageId: dosage.id,
-          isCompleted: dosage.taken,
+          isCompleted: isTakenOnThisDate, // Use the datesTaken to determine completion status
           allDosageData: dosage,
           allMedicationData: medication,
-          date: date.format('YYYY-MM-DD'),
+          date: formattedDate,
+          datesTaken: dosage.datesTaken,
+          rawEventStart: eventStart, // Keep the moment object for easy access
         });
       });
     }
@@ -87,19 +93,38 @@ const EventDetailsModal = ({
   onClose,
   onMarkAsDone
 }) => {
+  // Format the date for API call
+  const eventDateTime = event ? `${moment(event.start).format('YYYY-MM-DD')}T${moment(event.start).format('HH:mm:ss')}` : null;
 
   const {mutate, isPending} = useApiSend(
-    () => markAsTaken(event?.dosageId, event?.scheduleId),
+    () => markAsTaken(event?.dosageId, event?.scheduleId, eventDateTime),
     () => {
       toast.success("Marked as taken");
-      onMarkAsDone(event);
+      // The actual UI update is now handled by onMarkAsDone below
     },
     () => {
       toast.error("Failed to mark as taken");
-    }
-  )
+      // Revert the optimistic update
+      onMarkAs,Done(event, true); // Pass true to indicate this is a reversion
+    },
+    ['get-my-reports']
+  );
 
   if (!event) return null;
+
+  // Check if this specific event is completed based on datesTaken
+  const eventDate = moment(event.start).format('YYYY-MM-DD');
+  const isTakenOnEventDate = event.datesTaken && event.datesTaken.some(
+    dateTaken => moment(dateTaken.dateCreated).format('YYYY-MM-DD') === eventDate
+  );
+
+  const handleMarkAsDone = () => {
+    // First, apply optimistic update
+    onMarkAsDone(event);
+    
+    // Then trigger the API call
+    mutate();
+  };
 
   return (
     <Dialog
@@ -110,18 +135,6 @@ const EventDetailsModal = ({
     >
       <DialogTitle className="text-sm !text-black" sx={{ m: 0, p: 2 }}>
         {event.title}
-        {/* <IconButton
-          aria-label="close"
-          onClick={onClose}
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: (theme) => theme.palette.grey[500],
-          }}
-        >
-          x
-        </IconButton> */}
       </DialogTitle>
 
       <DialogContent dividers>
@@ -140,28 +153,26 @@ const EventDetailsModal = ({
           </p>
         </Box>
 
-        <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.100', mb: 2 }}>
+        <Box sx={{ p: 2, bgcolor: 'grey.100', mb: 2 }}>
           <p className="text-sm !text-black font-bold">Description</p>
           <p className="text-sm !text-black">{event.description}</p>
-        </Paper>
+        </Box>
       </DialogContent>
 
       <DialogActions sx={{ p: 2, justifyContent: 'space-between' }}>
         <Chip
-          label={event.isCompleted ? "Taken" : "Not Taken"}
-          color={event.isCompleted ? "success" : "warning"}
+          label={isTakenOnEventDate ? "Taken" : "Not Taken"}
+          color={isTakenOnEventDate ? "success" : "warning"}
         />
 
-        {(!event.isCompleted && user?.user?.userRole?.id === 1) && (
-
+        {(!isTakenOnEventDate && user?.user?.userRole?.id === 1) && (
           <GButton
             className="!w-auto !px-4"
             label="Mark as Taken"
-            onClick={() => mutate()}
+            onClick={handleMarkAsDone}
             isLoading={isPending}
             disabled={isPending}
           />
-
         )}
       </DialogActions>
     </Dialog>
@@ -170,11 +181,17 @@ const EventDetailsModal = ({
 
 // Custom Event Component to show color and completion status
 const CustomEvent = ({ event }) => {
+  // Check if this specific date is completed
+  const eventDate = moment(event.start).format('YYYY-MM-DD');
+  const isTakenOnEventDate = event.datesTaken && event.datesTaken.some(
+    dateTaken => moment(dateTaken.dateCreated).format('YYYY-MM-DD') === eventDate
+  );
+
   return (
     <div
       className="p-1 text-xs relative"
       style={{
-        backgroundColor: event.isCompleted
+        backgroundColor: isTakenOnEventDate
           ? "#48BB78" // Green for completed events
           : event.color,
         color: "white",
@@ -185,7 +202,7 @@ const CustomEvent = ({ event }) => {
       }}
     >
       {event.title}
-      {event.isCompleted && (
+      {isTakenOnEventDate && (
         <span className="absolute top-0 right-0 text-white font-bold">✓</span>
       )}
     </div>
@@ -207,8 +224,15 @@ const CustomDateCellWrapper = ({ children, value, darkMode }) => {
     return map;
   }, {});
 
-  // All taken check
-  const allTaken = dateEvents.length > 0 && Object.values(medsMap).every(arr => arr.every(e => e.isCompleted));
+  // Check if all medications for this date are taken
+  const allTaken = dateEvents.length > 0 && Object.values(medsMap).every(arr => 
+    arr.every(e => {
+      // Check if this specific event is taken based on datesTaken
+      return e.datesTaken && e.datesTaken.some(
+        dateTaken => moment(dateTaken.dateCreated).format('YYYY-MM-DD') === date
+      );
+    })
+  );
 
   return React.cloneElement(children, {
     style: {
@@ -228,7 +252,6 @@ export const MedicationCalendar = ({ medicationData, darkMode }) => {
   const [currentView, setCurrentView] = useState('month');
   const user = useSelector(state => state.auth);
 
-
   useEffect(() => {
     if (medicationData && medicationData.length) {
       setEvents(generateMedicationEvents(medicationData));
@@ -238,15 +261,51 @@ export const MedicationCalendar = ({ medicationData, darkMode }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
-  console.log(selectedEvent, "selectedEvent")
-
   const handleSelectEvent = (event) => {
     setSelectedEvent(event);
     setIsDetailsModalOpen(true);
   };
 
-  const handleMarkAsDone = (event) => {
-    setEvents(events.map(e => e.id === event.id ? { ...e, isCompleted: true } : e));
+  const handleMarkAsDone = (event, isRevert = false) => {
+    if (isRevert) {
+      // If this is a reversion due to API error, remove the optimistic update
+      setEvents(currentEvents => currentEvents.map(e => {
+        if (e.id === event.id) {
+          // Reset to the state before the optimistic update
+          return event;
+        }
+        return e;
+      }));
+      return;
+    }
+
+    // Apply optimistic update
+    const now = new Date();
+    const updatedEvents = events.map(e => {
+      if (e.id === event.id) {
+        // Add a new datesTaken entry
+        const newDateTaken = {
+          id: `temp-${Date.now()}`, // Temporary ID for frontend
+          userId: user?.user?.id,
+          dateCreated: now.toISOString()
+        };
+        
+        // Create a new datesTaken array with the new entry
+        const updatedDatesTaken = [...(e.datesTaken || []), newDateTaken];
+        
+        return { 
+          ...e, 
+          datesTaken: updatedDatesTaken,
+          isCompleted: true 
+        };
+      }
+      return e;
+    });
+    
+    setEvents(updatedEvents);
+    
+    // Automatically close the modal after optimistic update
+    // This improves UX by showing the green color change immediately
     setIsDetailsModalOpen(false);
   };
 
@@ -268,7 +327,6 @@ export const MedicationCalendar = ({ medicationData, darkMode }) => {
         <button onClick={goToPreviousMonth} className="bg-[#0F2D6B] text-white font-bold !px-4 !py-2 rounded hover:bg-blue-600 cursor-pointer text-xs">
           Previous
         </button>
-        {/* <h2 className={`text-xl font-bold ${textColorClass}`}>{moment(currentDate).format("MMMM YYYY")}</h2> */}
         <button onClick={goToNextMonth} className="bg-[#0F2D6B] text-white font-bold !px-4 !py-2 rounded hover:bg-blue-600 cursor-pointer text-xs">
           Next
         </button>
