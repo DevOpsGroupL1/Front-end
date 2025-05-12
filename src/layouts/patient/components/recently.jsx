@@ -9,7 +9,8 @@ export const RecentlyTaken = () => {
     ['recently'],
     () => getLastTaken(),
     {
-      enabled: true
+      enabled: true,
+      refetchOnWindowFocus: true
     }
   )
 
@@ -36,7 +37,7 @@ export const RecentlyTaken = () => {
           </div>
         ) : (
           data ? (
-            <RecentlyCard key={data.id} item={data} />
+            <RecentlyCard key={data.id} item={data?.length-1} />
           ) : <EmptyRecently />
         )
 
