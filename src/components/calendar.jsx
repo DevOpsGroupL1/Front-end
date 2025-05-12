@@ -107,7 +107,7 @@ const EventDetailsModal = ({
       // Revert the optimistic update
       onMarkAs,Done(event, true); // Pass true to indicate this is a reversion
     },
-    ['get-my-reports']
+    ['get-my-reports', 'recently','upcoming']
   );
 
   if (!event) return null;
