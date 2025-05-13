@@ -11,7 +11,7 @@ export const PatientReports = () => {
       enabled: true
     }
   )
-  const views=['month', 'week', 'day']
+  const views = ['month', 'week', 'day']
 
   return (
     <section className={"w-full h-full !p-10"}>
