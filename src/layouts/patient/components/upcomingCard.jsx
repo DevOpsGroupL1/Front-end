@@ -17,8 +17,8 @@ export const UpcomingCard = ({ item }) => {
       </div>
 
       <div className={"flex flex-col gap-1"}>
-        <h6 className={"font-bold text-lg"}>{item?.ailment} Medication</h6>
-        <p className={"text-sm"}>Dr. {item?.doctor?.fName} {item?.doctor?.lName}</p>
+        {/* <h6 className={"font-bold text-lg"}>{item?.ailment} Medication</h6>
+        <p className={"text-sm"}>Dr. {item?.doctor?.fName} {item?.doctor?.lName}</p> */}
         <p className={"text-sm"}>Specialization: {item?.doctor?.doctorDetails?.specialization}</p>
         <p className={"text-sm"}>Intake Time: {formatReadableDateTime(item?.intakeTime)}</p>
         <p className={"text-sm"}>Reminder Time: {formatReadableDateTime(item?.intakeTime)}</p>
